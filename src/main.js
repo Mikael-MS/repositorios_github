@@ -1,29 +1,27 @@
 
-
-
 class App {
     constructor(){
-        // Lista de repositorios
-        this.repositorios = [];
+        // List de repositorios
+        this.repositories = [];
 
         //Form
-        this.formulario = document.getElementById('form');
+        this.form = document.getElementById('form');
 
         //lista
-        this.lista = document.querySelector('.list-group');
+        this.list = document.querySelector('.list-group');
 
-        // Método registrar os eventos do formulario
-        this.registrarEventos()
+        // Método registrar os eventos do form
+        this.registerEvent()
     }
 
-    registrarEventos(){
-        this.formulario.onsubmit = evento => this.adicionarRepositorio(evento);
+    registerEvent(){
+        this.form.onsubmit = event => this.adicionarRepositorio(event);
     }
 
 
-    async adicionarRepositorio(evento){
-        //evita a pagina recarregar ao submit do formulario
-        evento.preventDefault();
+    async adicionarRepositorio(event){
+        //evita a pagina recarregar ao submit do form
+        event.preventDefault();
         
 
         //recuperar valor do input
@@ -37,13 +35,13 @@ class App {
         try{ 
             //api
             let response = await axios.get(`https://api.github.com/repos/${input}`)
-            console.log(response)
+            
 
             // destroctor do objeto respose data
             let {name, description, html_url, owner: {avatar_url}} = response.data
 
-            //Adiciona o repositorio na lista
-            this.repositorios.push({
+            //Adiciona o repositorio na list
+            this.repositories.push({
                 nome: name,
                 descricao: description,
                 avatar_url: avatar_url,
@@ -52,35 +50,34 @@ class App {
             });
 
             //renderizar aplicação
-            this.renderizarTela()
+            this.renderScreen()
         }catch(e){
 
             //Limpar erro ja existente
-            let error = this.lista.querySelector('.list-group-item-danger');
+            let error = this.list.querySelector('.list-group-item-danger');
             if(error !== null){
-                this.lista.removeChild(error)
+                this.list.removeChild(error)
             }
 
-            //lista
+            //list
             let liError = document.createElement('li');
             liError.setAttribute('class', 'list-group-item list-group-item-danger');
             let txtError = document.createTextNode(`O repositório ${input} não existe`);
             liError.appendChild(txtError);
-            this.lista.appendChild(liError);
+            this.list.appendChild(liError);
         }  
     }
 
-    renderizarTela(){
-        // Limpar conteudo da lista
-        this.lista.innerHTML = '';
+    renderScreen(){
+        // Limpar conteudo da list
+        this.list.innerHTML = '';
 
-        //Percorrer toda a lista e repositorios e criar os elementos
-        this.repositorios.forEach(repositorio => {
+        //Percorrer toda a list e repositorios e criar os elementos
+        this.repositories.forEach(repositorio, index => {
 
-            //lista
+            //list
             let li = document.createElement('li');
             li.setAttribute('class', 'list-group-item list-group-item-action');
-
 
             //img
             let img = document.createElement('img'); 
@@ -89,8 +86,8 @@ class App {
 
             //strong
             let strong = document.createElement('strong');
-            let txtNome = document.createTextNode(repositorio.nome);
-            strong.appendChild(txtNome);
+            let txtName = document.createTextNode(repositorio.nome);
+            strong.appendChild(txtName);
             li.appendChild(strong);
 
             //Paragrafo
@@ -107,25 +104,31 @@ class App {
             a.appendChild(txtA);
             li.appendChild(a);
 
-            // adicionar li na ul
-            this.lista.appendChild(li);
+           
+            const removeBtn = document.createElement("button")
+            removeBtn.setAttribute('class', 'btn btn-danger')
+            removeBtn.innerHTML = 'Remover'
+            removeBtn.onclick = () => this.removeItem(index)
+            li.appendChild(removeBtn)
 
+            
+            // adicionar li na ul
+            this.list.appendChild(li);
+            
             //limpar input 
-            this.formulario.querySelector('input[id=repositorio]').value = '';
+            this.form.querySelector('input[id=repositorio]').value = '';
 
             //adicionar foco no input
-            this.formulario.querySelector('input[id=repositorio]').focus();
+            this.form.querySelector('input[id=repositorio]').focus();
 
         });
 
     }
 
-    removeItem(repositorio){
-        this.repositorios.slice(this.repositorios.indexOf(repositorio),1)
-
-        this.renderizarTela()
+    removeItem(index) {
+        this.repositories = this.repositories.filter((item, i) => i != index)
+        this.renderScreen()
     }
-
  
 }
 
