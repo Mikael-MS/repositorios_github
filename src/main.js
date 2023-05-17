@@ -15,11 +15,11 @@ class App {
     }
 
     registerEvent(){
-        this.form.onsubmit = event => this.adicionarRepositorio(event);
+        this.form.onsubmit = event => this.addRepository(event);
     }
 
 
-    async adicionarRepositorio(event){
+    async addRepository(event){
         //evita a pagina recarregar ao submit do form
         event.preventDefault();
         
@@ -73,7 +73,7 @@ class App {
         this.list.innerHTML = '';
 
         //Percorrer toda a list e repositorios e criar os elementos
-        this.repositories.forEach(repositorio, index => {
+        this.repositories.forEach((repository,index ) => {
 
             //list
             let li = document.createElement('li');
@@ -81,25 +81,30 @@ class App {
 
             //img
             let img = document.createElement('img'); 
-            img.setAttribute('src', repositorio.avatar_url);
+            img.setAttribute('src', repository.avatar_url);
             li.appendChild(img)
 
             //strong
             let strong = document.createElement('strong');
-            let txtName = document.createTextNode(repositorio.nome);
+            let txtName = document.createTextNode(repository.nome);
             strong.appendChild(txtName);
             li.appendChild(strong);
 
             //Paragrafo
             let p = document.createElement('p');
-            let txtDescricao = document.createTextNode(repositorio.descricao);
-            p.appendChild(txtDescricao)
-            li.appendChild(p)
 
+            if(!repository.descricao){
+                p.innerHTML = ''
+            }else{
+                let txtDescricao = document.createTextNode(repository.descricao);
+                p.appendChild(txtDescricao)
+                li.appendChild(p)
+            }
+            
             //link
             let a = document.createElement('a');
             a.setAttribute('target', '_blank');
-            a.setAttribute('href', repositorio.link);
+            a.setAttribute('href', repository.link);
             let txtA = document.createTextNode('Acessar')
             a.appendChild(txtA);
             li.appendChild(a);
